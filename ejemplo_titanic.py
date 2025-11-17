@@ -51,3 +51,11 @@ st.write("""
 """)
 # Graficamos una tabla
 st.table(df.head())
+# Gráfico pequeño de sobrevivientes por sexo
+fig2, ax2 = plt.subplots()
+ax2.bar(["Masculino", "Femenino"], 
+        [df[df["Sex"]=="male"]["Survived"].sum(), df[df["Sex"]=="female"]["Survived"].sum()],
+        color=["blue", "red"])
+ax2.set_ylabel("Número de sobrevivientes")
+ax2.set_title("Supervivientes por sexo")
+st.pyplot(fig2)
