@@ -13,49 +13,59 @@ st.write("""
 
 # Usando la notación "with" para crear una barra lateral en la aplicación Streamlit.
 with st.sidebar:
-    # Título para la sección de opciones en la barra lateral.
     st.write("# Opciones")
     
-    # Crea un control deslizante (slider) que permite al usuario seleccionar un número de bins
-    # en el rango de 1 a 10, con un valor predeterminado de 2.
+    # Bins no puede ser 0 → mínimo 1 para evitar error
     div = st.slider('Número de bins:', 1, 10, 2)
     
-    # Muestra el valor actual del slider en la barra lateral.
-    st.write("Bins=", div)
+    st.write("Bins =", div)
 
-# Desplegamos un histograma con los datos del eje X
-fig, ax = plt.subplots(1, 2, figsize=(10, 3))
-ax[0].hist(df["Age"], bins=div)
-ax[0].set_xlabel("Edad")
-ax[0].set_ylabel("Frecuencia")
-ax[0].set_title("Histograma de edades")
+# ================================
+#          LAYOUT CON COLUMNAS
+# ================================
+col1, col2 = st.columns(2)
 
-# Tomando datos para hombres y contando la cantidad
-df_male = df[df["Sex"] == "male"]
-cant_male = len(df_male)
+# --------- Gráfico 1: Histograma ----------
+with col1:
+    fig1, ax1 = plt.subplots()
+    ax1.hist(df["Age"], bins=div)
+    ax1.set_xlabel("Edad")
+    ax1.set_ylabel("Frecuencia")
+    ax1.set_title("Histograma de edades")
+    st.pyplot(fig1)
 
-# Tomando datos para mujeres y contando la cantidad
-df_female = df[df["Sex"] == "female"]
-cant_female = len(df_female)
+# --------- Gráfico 2: Hombres vs Mujeres ----------
+with col2:
+    df_male = df[df["Sex"] == "male"]
+    cant_male = len(df_male)
 
-ax[1].bar(["Masculino", "Femenino"], [cant_male, cant_female], color = "red")
-ax[1].set_xlabel("Sexo")
-ax[1].set_ylabel("Cantidad")
-ax[1].set_title('Distribución de hombres y mujeres')
+    df_female = df[df["Sex"] == "female"]
+    cant_female = len(df_female)
 
-# Desplegamos el gráfico
-st.pyplot(fig)
+    fig2, ax2 = plt.subplots()
+    ax2.bar(["Masculino", "Femenino"], [cant_male, cant_female], color="red")
+    ax2.set_xlabel("Sexo")
+    ax2.set_ylabel("Cantidad")
+    ax2.set_title("Distribución de hombres y mujeres")
+    st.pyplot(fig2)
 
-st.write("""
-## Muestra de datos cargados
-""")
-# Graficamos una tabla
+# ================================
+#     grafico de sobrevivientes por sexo
+#  Supervivientes por sexo
+# ================================
+st.write("## Supervivientes por sexo")
+
+surv_male = df[df["Sex"]=="male"]["Survived"].sum()
+surv_female = df[df["Sex"]=="female"]["Survived"].sum()
+
+fig3, ax3 = plt.subplots()
+ax3.bar(["Masculino", "Femenino"], [surv_male, surv_female], color=["blue", "pink"])
+ax3.set_ylabel("Número de sobrevivientes")
+ax3.set_title("Supervivientes por sexo")
+st.pyplot(fig3)
+
+# ================================
+#   Tabla de datos cargados
+# ================================
+st.write("## Muestra de datos cargados")
 st.table(df.head())
-# Gráfico pequeño de sobrevivientes por sexo
-fig2, ax2 = plt.subplots()
-ax2.bar(["Masculino", "Femenino"], 
-        [df[df["Sex"]=="male"]["Survived"].sum(), df[df["Sex"]=="female"]["Survived"].sum()],
-        color=["blue", "red"])
-ax2.set_ylabel("Número de sobrevivientes")
-ax2.set_title("Supervivientes por sexo")
-st.pyplot(fig2)
